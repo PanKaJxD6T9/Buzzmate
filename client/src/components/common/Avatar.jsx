@@ -1,18 +1,39 @@
 import Image from "next/image";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaCamera } from "react-icons/fa";
 import ContextMenu from "./ContextMenu";
 import PhotoPicker from "./PhotoPicker";
+import PhotoLibrary from "./PhotoLibrary";
+import CapturePhoto from "./CapturePhoto";
 
 function Avatar({ type, image, setImage }) {
 
   const [hover, setHover] = useState(false)
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false)
   const [uploadPhoto, setuploadPhoto] = useState(false)
+  const [showLibrary, setShowLibrary] = useState(false)
+  const [showCamera, setShowCamera] = useState(false)
+
+  useEffect(()=>{
+    if(uploadPhoto){
+      const data = document.getElementById("photo-picker");
+      data.click();
+      document.body.onfocus = (e) => {
+        setTimeout(() => {
+          setuploadPhoto(false);
+        }, 1000);
+      }
+    }
+  }, [uploadPhoto])
+
   const contextMenuOptions = [
-    {name: "Take Photo", callback: () => {}},
-    {name: "Choose from Library", callback: () => {}},
+    {name: "Take Photo", callback: () => {
+      setShowCamera(true);
+    }},
+    {name: "Choose from Library", callback: () => {
+      setShowLibrary(true);
+    }},
     {name: "Upload Photo", callback: () => {
       setuploadPhoto(true);
     }},
@@ -26,8 +47,19 @@ function Avatar({ type, image, setImage }) {
     setIsContextMenuVisible(true)
   }
 
-  const photoPickerChangeHandler = () => {
-    
+  const photoPickerChangeHandler = async(e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    const data = document.createElement("img");
+    reader.onload = (e) => {
+      data.src = e.target.result;
+      data.setAttribute("data-src", e.target.result);
+    };
+    reader.readAsDataURL(file);
+    setTimeout(() => {
+      console.log(data.src)
+      setImage(data.src);
+    }, 100);
   }
 
   return (
@@ -71,6 +103,8 @@ function Avatar({ type, image, setImage }) {
         )}
       </div>
       {isContextMenuVisible && <ContextMenu options={contextMenuOptions} contextMenu={isContextMenuVisible} setContextMenu={setIsContextMenuVisible}/>}
+      {showCamera && <CapturePhoto setImage={setImage} hideCamera={setShowCamera}/>}
+      {showLibrary && <PhotoLibrary setImage={setImage} hideLibrary={setShowLibrary}/>}
       {uploadPhoto && <PhotoPicker onChange={photoPickerChangeHandler}/>}
     </>
   );

@@ -2,20 +2,65 @@ import Avatar from "@/components/common/Avatar";
 import Input from "@/components/common/Input";
 import { useStateProvider } from "@/context/StateContext";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
+import { ONBOARDING_ROUTE } from "@/utils/ApiRoutes";
+import axios from "axios";
+import { reducerCases } from "@/context/constants";
 
 function Onboarding() {
-  const [{ userInfo }] = useStateProvider();
+  const [{ userInfo, newUser }, dispatch] = useStateProvider();
   const [name, setName] = useState(userInfo?.name || "");
   const [about, setAbout] = useState("");
   const [image, setImage] = useState("/user.png");
   const router = useRouter();
 
-  const handleSubmit = () => {
-    // TODO: Implement profile submission
-    console.log("Profile submitted:", { name, about, image });
+  useEffect(() => {
+    if (!newUser && !userInfo) {
+      router.push("/login");
+    } else if (!newUser && userInfo?.email) {
+      router.push("/");
+    }
+  }, [newUser, userInfo, router]);
+
+  const validateDetails = () => {
+    if (name.length < 3) return false;
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (validateDetails()) {
+      const email = userInfo?.email;
+      try {
+        const { data } = await axios.post(ONBOARDING_ROUTE, {
+          email,
+          name,
+          about,
+          image,
+        });
+        if (data.success) {
+          dispatch({
+            type: reducerCases.SET_NEW_USER,
+            newUser: false
+          });
+          dispatch({
+            type: reducerCases.SET_USER_INFO,
+            userInfo: {
+              id: data.id,
+              email,
+              name,
+              profileImage: image,
+              about,
+            },
+            status: "",
+          });
+          router.push("/");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
   };
 
   return (

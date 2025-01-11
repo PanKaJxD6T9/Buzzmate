@@ -9,5 +9,8 @@ datasource db {
 
 model User {
   id Int @id @default(autoincrement())
-  email String @unique
+  email String @unique 
+  name String
+  profileImage String @default("")
+  about String @default("")
 }

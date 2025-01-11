@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { motion } from "framer-motion";
 import { GoogleAuthProvider } from "firebase/auth";
@@ -14,9 +14,15 @@ import { reducerCases } from "@/context/constants";
 function login() {
 
   const router = useRouter();
-  const [{}, dispatch] = useStateProvider();
-  const handleLogin = async() => {
+  const [{userInfo, newUser}, dispatch] = useStateProvider();
 
+  useEffect(() => {
+    if (userInfo?.id && !newUser) {
+      router.push("/");
+    }
+  }, [userInfo, newUser]);
+
+  const handleLogin = async() => {
     const provider = new GoogleAuthProvider();
     const { user: {displayName: name, email, photoURL: profileImage} } = await signInWithPopup(firebaseAuth, provider);
     try{
@@ -33,6 +39,14 @@ function login() {
             status: ""
           });
           router.push("/onboarding");
+        } else {
+          const { id, name, email, image, about } = data;
+          dispatch({
+            type: reducerCases.SET_USER_INFO,
+            userInfo: {id, email, name, profileImage: image, about },
+            status: ""
+          });
+          router.push("/");
         }
       }
     } catch(err){

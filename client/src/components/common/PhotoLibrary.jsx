@@ -17,7 +17,7 @@ function PhotoLibrary({setImage, hideLibrary}) {
   ]
 
   return <div className="fixed top-0 left-0 max-h-[100vh] max-w-[100vw] h-full w-full flex justify-center items-center z-[100]">
-    <div className="h-max w-max bg-gray-900 gap-6 rounded-lg p-4">
+    <div className="h-max w-max bg-gradient-to-br from-purple-600 via-blue-500 to-purple-800 border-2 border-white gap-6 rounded-lg p-4">
       <div className="pt-2 pr-2 flex items-end justify-end" onClick={() => hideLibrary(false)}>
         <IoClose className="text-white h-10 w-10 cursor-pointer"/>
       </div>

@@ -8,42 +8,55 @@ import { reducerCases } from "@/context/constants";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import axios from "axios";
 import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
-;
 
 function Main() {
-
   const [{ userInfo }, dispatch] = useStateProvider();
-  const [loginRedirect, setLoginRedirect] = useState(false)
+  const [loginRedirect, setLoginRedirect] = useState(false);
   const router = useRouter();
 
-  useEffect(()=>{
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async(user) => {
+      if (!user) {
+        setLoginRedirect(true);
+        return;
+      }
+      
+      try {
+        const {data} = await axios.post(CHECK_USER_ROUTE, {email: user.email});
+        
+        if(!data.success){
+          router.push("/login");
+          return;
+        }
+
+        if (data.data) {
+          const { id, name, email, profileImage, about } = data.data;
+          dispatch({
+            type: reducerCases.SET_USER_INFO,
+            userInfo: { 
+              id, 
+              email, 
+              name, 
+              profileImage, 
+              about,
+              status: "" 
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        router.push("/login");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [dispatch, router]);
+
+  useEffect(() => {
     if(loginRedirect){
       router.push("/login");
     }
-  }, [loginRedirect])
-
-  onAuthStateChanged(firebaseAuth, async(user) => {
-    if (!user) {
-      setLoginRedirect(true)
-    }
-    if(!userInfo && user?.email){
-      const {data} = await axios.post(CHECK_USER_ROUTE, {email: user.email});
-      
-      if(!data.success){
-        router.push("/login");
-      }
-
-      if (data.data) {
-        const { id, name, email, image, about } = data.data;
-        dispatch({
-          type: reducerCases.SET_USER_INFO,
-          userInfo: { id, email, name, profileImage: image, about },
-          status: ""
-        });
-      }
-    }
-      
-    })
+  }, [loginRedirect, router]);
 
   return (
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full">

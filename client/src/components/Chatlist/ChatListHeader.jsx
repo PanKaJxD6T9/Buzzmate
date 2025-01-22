@@ -1,7 +1,7 @@
 import React from "react";
 import Avatar from "../common/Avatar";
 import { useStateProvider } from "@/context/StateContext";
-
+import {BsFillChatLeftTextFill, BsThreeDotsVertical} from "react-icons/bs";
 
 function ChatListHeader() {
 
@@ -11,9 +11,14 @@ function ChatListHeader() {
   return (
     <div className="h-16 px-4 py-3 flex justify-between items-center">
       <div className="cursor-pointer">
-        <Avatar type="sm" image={userInfo?.profileImage} />
+        <Avatar type="sm" image={userInfo?.profileImage || "/user.png"} />
       </div>
-      <div className="flex "></div>
+      <div className="flex gap-6">
+        <BsFillChatLeftTextFill className="text-white"/>
+        <>
+          <BsThreeDotsVertical className="text-white"/>
+        </>
+      </div>
     </div>
   );
 }

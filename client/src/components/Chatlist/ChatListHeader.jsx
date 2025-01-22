@@ -6,7 +6,6 @@ import {BsFillChatLeftTextFill, BsThreeDotsVertical} from "react-icons/bs";
 function ChatListHeader() {
 
   const [{ userInfo }, dispatch] = useStateProvider();
-  console.log(userInfo)
 
   return (
     <div className="h-16 px-4 py-3 flex justify-between items-center">
@@ -14,9 +13,9 @@ function ChatListHeader() {
         <Avatar type="sm" image={userInfo?.profileImage || "/user.png"} />
       </div>
       <div className="flex gap-6">
-        <BsFillChatLeftTextFill className="text-white"/>
+        <BsFillChatLeftTextFill className="text-white cursor-pointer text-xl" title="New Chat"/>
         <>
-          <BsThreeDotsVertical className="text-white"/>
+          <BsThreeDotsVertical className="text-white cursor-pointer text-xl" title="More"/>
         </>
       </div>
     </div>

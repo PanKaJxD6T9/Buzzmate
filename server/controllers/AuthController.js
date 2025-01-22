@@ -29,7 +29,7 @@ export const onBoarding = async(req, res, next) => {
             return res.json({message: "Email, Name and Profile Image are required", success: false});
         }
         const prisma = getPrismaInstance();
-        await prisma.user.create({
+        const user = await prisma.user.create({
             data: {
                 email,
                 name,
@@ -37,7 +37,7 @@ export const onBoarding = async(req, res, next) => {
                 about
             }
         });
-        return res.json({message: "User created", success: true});
+        return res.json({message: "User created", success: true, user});
     } catch (error) {
         next(error);
     }

@@ -24,8 +24,8 @@ function login() {
 
   const handleLogin = async() => {
     const provider = new GoogleAuthProvider();
-    const { user: {displayName: name, email, photoURL: profileImage} } = await signInWithPopup(firebaseAuth, provider);
-    try{
+    try {
+      const { user: {displayName: name, email, photoURL: profileImage} } = await signInWithPopup(firebaseAuth, provider);
       if(email){
         const {data} = await axios.post(CHECK_USER_ROUTE, {email});
         if(!data.success){
@@ -40,7 +40,7 @@ function login() {
           });
           router.push("/onboarding");
         } else {
-          const { id, name, email, image, about } = data;
+          const { id, name, email, image, about } = data.data;
           dispatch({
             type: reducerCases.SET_USER_INFO,
             userInfo: {id, email, name, profileImage: image, about },
@@ -49,8 +49,13 @@ function login() {
           router.push("/");
         }
       }
-    } catch(err){
-      console.log(err)
+    } catch (error) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        console.log('Sign-in popup was closed before finishing the sign-in process');
+        // You can add UI feedback here if needed
+      } else {
+        console.error('Authentication error:', error);
+      }
     }
   }
 

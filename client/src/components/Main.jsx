@@ -8,6 +8,7 @@ import { reducerCases } from "@/context/constants";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import axios from "axios";
 import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
+import Chat from "./Chat/Chat";
 
 function Main() {
   const [{ userInfo }, dispatch] = useStateProvider();
@@ -61,7 +62,8 @@ function Main() {
   return (
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full">
       <ChatList />
-      <Empty />
+      {/* <Empty /> */}
+      <Chat />
     </div>
   );
 }

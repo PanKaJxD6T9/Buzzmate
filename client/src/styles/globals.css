@@ -34,3 +34,13 @@
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #ffffff3b !important;
+  border-radius: 4px !important;
+}

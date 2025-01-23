@@ -7,9 +7,9 @@ function ChatList() {
   return (
     <div className="bg-gray-900 flex flex-col max-h-screen z-20">
       <>
-        <ChatListHeader />
         <SearchBar />
         <List />
+        <ChatListHeader />
       </>
     </div>
   );

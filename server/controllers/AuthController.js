@@ -68,7 +68,7 @@ export const getAllUsers = async(req, res, next) => {
             }
             usersGroupedByInitial[initial].push(user);
         })
-        // return res.json({message: "Users found", success: true, users: usersGroupedByInitial});
+        return res.status(200).json({message: "Users found", success: true, users: usersGroupedByInitial});
     } catch(err){
         next(err);
     }

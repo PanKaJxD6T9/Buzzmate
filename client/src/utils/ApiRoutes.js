@@ -4,3 +4,4 @@ const AUTH_ROUTE = `${HOST}/api/auth`;
 
 export const CHECK_USER_ROUTE = `${AUTH_ROUTE}/check-user`;
 export const ONBOARDING_ROUTE = `${AUTH_ROUTE}/onboarding`;
+export const GET_ALL_USERS_ROUTE = `${AUTH_ROUTE}/all-users`;

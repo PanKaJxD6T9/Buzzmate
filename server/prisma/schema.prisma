@@ -13,4 +13,18 @@ model User {
   name String
   profileImage String @default("")
   about String @default("")
+  sentMessages Message[] @relation("sentMessages")
+  receivedMessages Message[] @relation("receivedMessages")
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+  sender User @relation("sentMessages", fields: [senderId], references: [id])
+  senderId Int
+  receiver User @relation("receivedMessages", fields: [receiverId], references: [id])
+  receiverId Int
+  type String @default("text")
+  message String
+  messageStatus String @default("sent")
+  createdAt DateTime @default(now())
 }

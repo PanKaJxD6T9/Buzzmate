@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ChatList from "./Chatlist/ChatList";
 import Empty from "./Empty";
 import { onAuthStateChanged } from "firebase/auth";
@@ -7,13 +7,16 @@ import { useRouter } from "next/router";
 import { reducerCases } from "@/context/constants";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import axios from "axios";
-import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
+import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import Chat from "./Chat/Chat";
+import { io } from "socket.io-client";
 
 function Main() {
   const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
   const [loginRedirect, setLoginRedirect] = useState(false);
   const router = useRouter();
+  const socket = useRef();
+  const [socketEvent, setSocketEvent] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, async(user) => {
@@ -58,6 +61,47 @@ function Main() {
       router.push("/login");
     }
   }, [loginRedirect, router]);
+
+  useEffect(()=>{
+    if(userInfo){
+      socket.current = io(HOST);
+      socket.current.emit("add-user", userInfo.id);
+      dispatch({
+        type: reducerCases.SET_SOCKET,
+        socket
+      })
+    }
+  }, [userInfo])
+
+  useEffect(()=>{
+    if(socket.current && !socketEvent){
+      socket.current.on("message-received", (data) => {
+        dispatch({
+          type: reducerCases.ADD_MESSAGE,
+          newMessage:{
+            ...data.message,
+          }
+        })
+      })
+
+      setSocketEvent(true);
+    }
+  }, [socket.current])
+
+  useEffect(()=>{
+    const getMessages = async () => {
+      const {data: {messages}} = await axios.get(`${GET_MESSAGES_ROUTE}/${userInfo.id}/${currentChatUser.id}`);
+      // console.log({data});
+      dispatch({
+        type: reducerCases.SET_MESSAGES,
+        messages
+      })
+    }
+
+    if(currentChatUser?.id){
+      getMessages();
+    }
+  }, [currentChatUser])
 
   return (
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full">

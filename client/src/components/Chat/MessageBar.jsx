@@ -2,6 +2,7 @@ import { reducerCases } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
 import { ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
+import EmojiPicker from "emoji-picker-react";
 import React, { useState } from "react";
 import { BsEmojiSmile } from "react-icons/bs";
 import { FaMicrophone } from "react-icons/fa";
@@ -12,6 +13,8 @@ function MessageBar() {
 
   const [{userInfo, currentChatUser, socket}, dispatch] = useStateProvider();
   const [message, setMessage] = useState("");
+  const emojiRef = React.useRef(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const sendMessage = async()=>{
     try{
       const {data} = await axios.post(ADD_MESSAGE_ROUTE, {
@@ -37,14 +40,51 @@ function MessageBar() {
     }
   }
 
+  React.useEffect(() => {
+      const handleClickOutside = (event) => {
+        if(event.target.id !== "emoji-opener") {
+          if(emojiRef.current && !emojiRef.current.contains(event.target)) {
+            setShowEmojiPicker(false);
+          }
+        }
+      };
+      document.addEventListener("click", handleClickOutside);
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
+      };
+    }, []);
+
+  const handleEmojiDialogBox = () => {
+    setShowEmojiPicker(!showEmojiPicker);
+  };
+
+  const handleEmojiClick = (emoji) => {
+    setMessage((prevMessage) => prevMessage += emoji.emoji);
+  };
+
   return (
     <div className="bg-gradient-to-r from-gray-900 to-gray-800 h-20 px-4 flex items-center gap-6 relative shadow-lg border-t border-gray-700">
       <>
         <div className="flex gap-6">
+          
           <BsEmojiSmile 
             className="text-gray-300 hover:text-yellow-400 cursor-pointer text-xl transition-colors duration-300" 
             title="Emoji"
+            id="emoji-opener"
+            onClick={handleEmojiDialogBox}
           />
+          {showEmojiPicker && (
+            <div className="absolute bottom-24 left-16 z-40" ref={emojiRef}>
+              <EmojiPicker 
+                onEmojiClick={handleEmojiClick}
+                theme="dark"
+              />
+            </div>
+          )}
+          {/* <FaMicrophone 
+            className="text-gray-300 hover:text-green-400 cursor-pointer text-xl transition-colors duration-300" 
+            title="Audio Call"
+            /> */}
           <ImAttachment 
             className="text-gray-300 hover:text-blue-400 cursor-pointer text-xl transition-colors duration-300" 
             title="Attach File or Document"

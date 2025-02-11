@@ -1,5 +1,6 @@
 import getPrismaInstance from "../utils/PrismaClient.js"
 /* global onlineUsers */
+import {renameSync} from "fs";
 
 export const addMessage = async (req, res, next) => {
     try {
@@ -10,8 +11,8 @@ export const addMessage = async (req, res, next) => {
             const newMessage = await prisma.message.create({
                 data: {
                     message,
-                    senderId: parseInt(from),
-                    receiverId: parseInt(to),
+                    sender: {connect: {id: parseInt(from)}},
+                    receiver: {connect: {id: parseInt(to)}},
                     messageStatus: getUser ? "delivered" : "sent"
                 },
                 include: {
@@ -69,6 +70,36 @@ export const getAllMessages = async (req, res, next) => {
         });
 
         return res.status(200).json({messages, success: true});
+    } catch (error) {
+        next(error);
+    }
+
+}
+
+export const addImageMessage = async (req, res, next) => {
+    try {
+        if(req.file){
+            const date = Date.now();
+            let fileName = "public/images/" + date + req.file.originalname;
+            renameSync(req.file.path, fileName);
+            const prisma = getPrismaInstance();
+            const {from, to} = req.query;
+
+            if(from && to){
+                const message = await prisma.message.create({
+                    data: {
+                        message: fileName,
+                        type: "image",
+                        sender: {connect: {id: parseInt(from)}},
+                        receiver: {connect: {id: parseInt(to)}},
+                        // messageStatus: "sent"
+                    }
+                });
+                return res.status(201).json({message, success: true});
+            }
+            return res.status(400).json({message: "All fields are required", success: false});
+        }
+        return res.status(400).json({message: "Image is required", success: false});
     } catch (error) {
         next(error);
     }

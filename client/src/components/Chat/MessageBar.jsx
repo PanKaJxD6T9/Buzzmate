@@ -1,6 +1,6 @@
 import { reducerCases } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
-import { ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
+import { ADD_IMAGE_MESSAGE_ROUTE, ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 import React, { useState } from "react";
@@ -8,6 +8,7 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { FaMicrophone } from "react-icons/fa";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
+import PhotoPicker from "../common/PhotoPicker";
 
 function MessageBar() {
 
@@ -15,6 +16,10 @@ function MessageBar() {
   const [message, setMessage] = useState("");
   const emojiRef = React.useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [uploadPhoto, setuploadPhoto] = useState(false)
+  const [uploadFile, setuploadFile] = useState(false)
+  
+  
   const sendMessage = async()=>{
     try{
       const {data} = await axios.post(ADD_MESSAGE_ROUTE, {
@@ -62,6 +67,51 @@ function MessageBar() {
     setMessage((prevMessage) => prevMessage += emoji.emoji);
   };
 
+  React.useEffect(()=>{
+    if(uploadPhoto){
+      const data = document.getElementById("photo-picker");
+      data.click();
+      document.body.onfocus = (e) => {
+        setTimeout(() => {
+          setuploadPhoto(false);
+        }, 1000);
+      }
+    }
+  }, [uploadPhoto])
+
+  const photoPickerChangeHandler = async(e) => {
+    try{
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append("image", file);
+      const response = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        },
+        params: {
+          from: userInfo?.id,
+          to: currentChatUser?.id
+        },
+      });
+      if (response.status === 201) {
+        socket.current.emit("send-message", {
+          message: response.data.message,
+          from: userInfo?.id,
+          to: currentChatUser?.id
+        });
+        dispatch({
+          type: reducerCases.ADD_MESSAGE,
+          newMessage: {
+            ...response.data.message
+          },
+          fromSelf: true
+        });
+      }
+    }catch(err){
+      console.log(err);
+    }
+  }
+
   return (
     <div className="bg-gradient-to-r from-gray-900 to-gray-800 h-20 px-4 flex items-center gap-6 relative shadow-lg border-t border-gray-700">
       <>
@@ -88,6 +138,8 @@ function MessageBar() {
           <ImAttachment 
             className="text-gray-300 hover:text-blue-400 cursor-pointer text-xl transition-colors duration-300" 
             title="Attach File or Document"
+            id="file-opener"
+            onClick={() => setuploadPhoto(true)}
           />
         </div>
         <div className="w-full rounded-lg h-12 flex items-center bg-gray-800 hover:bg-gray-750 transition-all duration-300 shadow-inner">
@@ -116,6 +168,7 @@ function MessageBar() {
           </button>
         </div>
       </>
+      {uploadPhoto && <PhotoPicker onChange={photoPickerChangeHandler}/>}
     </div>
   );
 }

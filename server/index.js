@@ -13,6 +13,7 @@ app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 
 app.use("/public/images", express.static("public/images"));
+app.use("/public/recordings", express.static("public/recordings"));
 
 app.use("/api/auth", AuthRoutes);
 app.use("/api/message", MessageRoutes);

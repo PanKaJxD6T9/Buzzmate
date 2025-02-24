@@ -9,6 +9,8 @@ import { FaMicrophone } from "react-icons/fa";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
 import PhotoPicker from "../common/PhotoPicker";
+import dynamic from "next/dynamic";
+const CaptureAudio = dynamic(() => import("../common/CaptureAudio"), {ssr: false});
 
 function MessageBar() {
 
@@ -17,7 +19,7 @@ function MessageBar() {
   const emojiRef = React.useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [uploadPhoto, setuploadPhoto] = useState(false)
-  const [uploadFile, setuploadFile] = useState(false)
+  const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   
   
   const sendMessage = async()=>{
@@ -114,6 +116,8 @@ function MessageBar() {
 
   return (
     <div className="bg-gradient-to-r from-gray-900 to-gray-800 h-20 px-4 flex items-center gap-6 relative shadow-lg border-t border-gray-700">
+      {
+        !showAudioRecorder && (
       <>
         <div className="flex gap-6">
           
@@ -131,16 +135,12 @@ function MessageBar() {
               />
             </div>
           )}
-          {/* <FaMicrophone 
-            className="text-gray-300 hover:text-green-400 cursor-pointer text-xl transition-colors duration-300" 
-            title="Audio Call"
-            /> */}
-          <ImAttachment 
-            className="text-gray-300 hover:text-blue-400 cursor-pointer text-xl transition-colors duration-300" 
-            title="Attach File or Document"
-            id="file-opener"
-            onClick={() => setuploadPhoto(true)}
-          />
+            <ImAttachment 
+              className="text-gray-300 hover:text-blue-400 cursor-pointer text-xl transition-colors duration-300" 
+              title="Attach File or Document"
+              id="file-opener"
+              onClick={() => setuploadPhoto(true)}
+            />
         </div>
         <div className="w-full rounded-lg h-12 flex items-center bg-gray-800 hover:bg-gray-750 transition-all duration-300 shadow-inner">
           <input
@@ -156,19 +156,32 @@ function MessageBar() {
             className={`p-2 rounded-full hover:bg-blue-600 transition-colors duration-300 ${
               message.trim() ? 'bg-blue-500' : 'bg-gray-700'
             }`}
-            disabled={!message.trim()}
+            // disabled={!message.trim()}
           >
-            <MdSend 
-              className={`cursor-pointer text-xl ${
-                message.trim() ? 'text-white' : 'text-gray-400'
-              }`} 
-              title="Send"
-              
-            />
+            {
+              message.length ? (
+                <MdSend
+                  className={`cursor-pointer text-xl ${message.trim() ? 'text-white' : 'text-gray-400'
+                    }`}
+                  title="Send"
+
+                />
+              )
+                : (
+                <FaMicrophone
+                  className="text-gray-300 hover:text-green-400 cursor-pointer text-xl transition-colors duration-300"
+                  title="Record Audio"
+                  onClick={() => setShowAudioRecorder(true)}
+                />
+              )
+            }
+            
           </button>
         </div>
       </>
+      )}
       {uploadPhoto && <PhotoPicker onChange={photoPickerChangeHandler}/>}
+      {showAudioRecorder && <CaptureAudio hide={()=>setShowAudioRecorder(false)}/>}
     </div>
   );
 }

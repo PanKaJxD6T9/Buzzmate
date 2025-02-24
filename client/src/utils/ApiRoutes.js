@@ -10,3 +10,4 @@ export const GET_ALL_USERS_ROUTE = `${AUTH_ROUTE}/all-users`;
 export const ADD_MESSAGE_ROUTE = `${MESSAGE_ROUTE}/send-message`;
 export const GET_MESSAGES_ROUTE = `${MESSAGE_ROUTE}/get-messages`;
 export const ADD_IMAGE_MESSAGE_ROUTE = `${MESSAGE_ROUTE}/add-image-message`;
+export const ADD_AUDIO_MESSAGE_ROUTE = `${MESSAGE_ROUTE}/add-audio-message`;

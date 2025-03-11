@@ -10,9 +10,10 @@ import axios from "axios";
 import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
+import SearchMessages from "./Chat/SearchMessages";
 
 function Main() {
-  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] = useStateProvider();
   const [loginRedirect, setLoginRedirect] = useState(false);
   const router = useRouter();
   const socket = useRef();
@@ -107,7 +108,12 @@ function Main() {
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full">
       <ChatList />
       {
-        currentChatUser ? <Chat /> : <Empty />
+        currentChatUser ? 
+        <div className={messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}>
+          <Chat />
+          {messagesSearch && <SearchMessages />}
+        </div> : 
+        <Empty />
       }
     </div>
   );

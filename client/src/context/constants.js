@@ -6,6 +6,7 @@ export const reducerCases = {
     SET_MESSAGES: "SET_MESSAGES",
     SET_SOCKET: "SET_SOCKET",
     ADD_MESSAGE: "ADD_MESSAGE",
+    SET_SEARCH_MESSAGE: "SET_SEARCH_MESSAGE",
 }
 
 // 4:53

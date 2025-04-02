@@ -1,3 +1,5 @@
+import { reducerCases } from "@/context/constants";
+import { useStateProvider } from "@/context/StateContext";
 import React, { useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import { BsFilter } from "react-icons/bs";
@@ -6,9 +8,13 @@ import { IoCloseOutline } from "react-icons/io5";
 function SearchBar() {
   const [searchText, setSearchText] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [{ contactSearch }, dispatch] = useStateProvider();
 
   const handleClearInput = () => {
-    setSearchText("");
+    dispatch({ 
+      type: reducerCases.SET_CONTACT_SEARCH, 
+      contactSearch: "" 
+    });
   };
 
   return (
@@ -23,14 +29,14 @@ function SearchBar() {
         <div className="flex-grow relative">
           <input
             type="text"
-            value={searchText}
+            value={contactSearch}
             placeholder="Search or start new chat"
             className="bg-transparent text-sm focus:outline-none text-white w-full placeholder:text-gray-300"
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => dispatch({ type: reducerCases.SET_CONTACT_SEARCH, contactSearch: e.target.value })}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          {searchText && (
+          {contactSearch && (
             <button
               onClick={handleClearInput}
               className="absolute right-0 top-1/2 -translate-y-1/2 text-white hover:text-green-500 transition-colors duration-300"

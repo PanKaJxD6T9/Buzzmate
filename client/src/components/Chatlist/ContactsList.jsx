@@ -12,12 +12,32 @@ function ContactsList() {
 
   const [allContacts, setAllContacts] = useState([]);
   const [{}, dispatch] = useStateProvider();
+  const [searchText, setSearchText] = useState("");
+  const [searchContacts, setSearchContacts] = useState([]);
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+
+    if(searchText.length){
+
+      const filteredData = {};
+      Object.keys(allContacts).forEach((key) => {
+        filteredData[key] = allContacts[key].filter((obj) => obj.name.toLowerCase().includes(searchText.toLowerCase()));
+      });
+      setSearchContacts(filteredData);
+
+    } else {
+      setSearchContacts(allContacts);
+    }
+
+  }, [searchText])
 
   useEffect(() => {
     const getContacts = async () => {
       try{
         const {data: {users}} = await axios.get(GET_ALL_USERS_ROUTE);
         setAllContacts(users);
+        setSearchContacts(users);
       } catch(err){
         console.log(err);
       }
@@ -25,13 +45,9 @@ function ContactsList() {
     getContacts();
   }, [])
 
-  const [searchText, setSearchText] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
-
   const handleClearInput = () => {
     setSearchText("");
   };
-
 
   return <div className="h-full flex flex-col">
     <div className="h-16 flex items-end px-3 py-4">
@@ -57,9 +73,9 @@ function ContactsList() {
           <input
             type="text"
             value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             placeholder="Search or start new chat"
             className="bg-transparent text-sm focus:outline-none text-white w-full placeholder:text-gray-300"
-            onChange={(e) => setSearchText(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
@@ -76,13 +92,15 @@ function ContactsList() {
     </div>
     <div className="overflow-auto custom-scrollbar h-full">
       {
-        Object.entries(allContacts).map(([initial, list]) => {
+        Object.entries(searchContacts).map(([initial, list]) => {
           return (
             <div key={Date.now() + initial} className="mb-2">
               <div className="sticky top-0 bg-dark-secondary z-10">
-                <div className="text-teal-light px-6 py-2 text-lg font-semibold backdrop-blur-sm bg-opacity-80">
-                  {initial}
-                </div>
+                {list.length > 0 && (
+                  <div className="text-teal-light px-6 py-2 text-lg font-semibold backdrop-blur-sm bg-opacity-80">
+                    {initial}
+                  </div>
+                )}
               </div>
               <div className="space-y-1">
                 {

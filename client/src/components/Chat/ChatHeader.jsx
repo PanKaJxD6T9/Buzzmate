@@ -9,6 +9,31 @@ import { reducerCases } from "@/context/constants";
 
 function ChatHeader() {
   const [{currentChatUser}, dispatch] = useStateProvider();
+
+  const handleAudioCall = () => {
+    dispatch({
+      type: reducerCases.SET_AUDIO_CALL,
+      audioCall: {
+        ...currentChatUser,
+        type: "outgoing",
+        callType: "audio",
+        roomId: Date.now(),
+      }
+    })
+  }
+
+  const handleVideoCall = () => {
+    dispatch({
+      type: reducerCases.SET_VIDEO_CALL,
+      videoCall: {
+        ...currentChatUser,
+        type: "outgoing",
+        callType: "video",
+        roomId: Date.now(),
+      }
+    })
+  }
+
   const [showTooltip, setShowTooltip] = useState(null);
 
   return (
@@ -37,6 +62,7 @@ function ChatHeader() {
             <MdCall 
               className="text-gray-300 hover:text-white cursor-pointer text-xl transition-colors"
               style={{ color: showTooltip === "Call" ? "#00a884" : undefined }}
+              onClick={handleAudioCall}
             />
           </div>
           {showTooltip === "Call" && (
@@ -56,6 +82,7 @@ function ChatHeader() {
             <IoVideocam 
               className="text-gray-300 hover:text-white cursor-pointer text-xl transition-colors"
               style={{ color: showTooltip === "Video Call" ? "#00a884" : undefined }}
+              onClick={handleVideoCall}
             />
           </div>
           {showTooltip === "Video Call" && (

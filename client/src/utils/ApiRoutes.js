@@ -6,6 +6,7 @@ const MESSAGE_ROUTE = `${HOST}/api/message`;
 export const CHECK_USER_ROUTE = `${AUTH_ROUTE}/check-user`;
 export const ONBOARDING_ROUTE = `${AUTH_ROUTE}/onboarding`;
 export const GET_ALL_USERS_ROUTE = `${AUTH_ROUTE}/all-users`;
+export const GET_CALL_TOKEN_ROUTE = `${AUTH_ROUTE}/generate-token`;
 
 export const ADD_MESSAGE_ROUTE = `${MESSAGE_ROUTE}/send-message`;
 export const GET_MESSAGES_ROUTE = `${MESSAGE_ROUTE}/get-messages`;

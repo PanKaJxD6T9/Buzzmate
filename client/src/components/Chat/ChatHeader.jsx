@@ -6,9 +6,36 @@ import {BiSearch} from "react-icons/bi";
 import {BsThreeDotsVertical} from "react-icons/bs";
 import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
+import ContextMenu from "../common/ContextMenu";
 
 function ChatHeader() {
-  const [{currentChatUser}, dispatch] = useStateProvider();
+  const [{currentChatUser, onlineUsers}, dispatch] = useStateProvider();
+
+  const [contextMenuCoords, setContextMenuCoords] = React.useState({
+    x: 0,
+    y: 0
+  });
+
+  const [isContextMenuVisible, setIsContextMenuVisible] = React.useState(false);
+
+  const showContextMenu = (e) => {
+    e.preventDefault()
+    setContextMenuCoords({
+      x: e.pageX ,
+      y: e.pageY
+    })
+    setIsContextMenuVisible(true)
+  }
+
+  const contextMenuOptions = [
+    {
+      name: "Exit",
+      callback: async () => {
+        setIsContextMenuVisible(false)
+        dispatch({type: reducerCases.SET_EXIT_CHAT})
+      }
+    }
+  ]
 
   const handleAudioCall = () => {
     dispatch({
@@ -47,7 +74,9 @@ function ChatHeader() {
             {currentChatUser?.name}
           </span>
           <span className="text-gray-400 text-sm">
-           Online/Offline
+           {
+            onlineUsers.includes(currentChatUser.id) ? "Online" : "Offline"
+           }
           </span>
         </div>
       </div>
@@ -122,8 +151,21 @@ function ChatHeader() {
             <BsThreeDotsVertical 
               className="text-gray-300 hover:text-white cursor-pointer text-xl transition-colors"
               style={{ color: showTooltip === "More" ? "#00a884" : undefined }}
+              id="context-opener"
+              onClick={(e) => showContextMenu(e)}
             />
           </div>
+          {
+            isContextMenuVisible && (
+              <ContextMenu 
+                options={contextMenuOptions}
+                coords={contextMenuCoords}
+                contextMenu={isContextMenuVisible}
+                setContextMenu={setIsContextMenuVisible}
+
+              />
+            )
+          }
           {showTooltip === "More" && (
             <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
               More

@@ -25,7 +25,14 @@ function ContextMenu({ options, contextMenu, setContextMenu }) {
   }
 
   return (
-    <div className={`bg-dropdown-background fixed z-[100] shadow-xl rounded-md overflow-hidden top-[70%] left-[70%] translate-x-[-50%] translate-y-[-50%]`} ref={contextMenuRef}>
+    <div 
+      className="bg-dropdown-background fixed z-[100] shadow-xl rounded-md overflow-hidden"
+      ref={contextMenuRef}
+      style={{
+        top: `${contextMenu.y}px`,
+        left: `${contextMenu.x}px`
+      }}
+    >
       <ul>
         {
           options.map(({ name, callback }) => {

@@ -107,6 +107,11 @@ const reducer = (state, action) => {
                 ...state,
                 incomingAudioCall: action.incomingAudioCall,
             }
+        case reducerCases.SET_EXIT_CHAT:
+            return {
+                ...state,
+                currentChatUser: undefined,
+            }
         default:
             return state;
     }

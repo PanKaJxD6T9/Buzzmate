@@ -3,10 +3,41 @@ import Avatar from "../common/Avatar";
 import { useStateProvider } from "@/context/StateContext";
 import {BsFillChatLeftTextFill, BsThreeDotsVertical} from "react-icons/bs";
 import { reducerCases } from "@/context/constants";
+import ContextMenu from "../common/ContextMenu";
+import { useRouter } from "next/router";
 
 function ChatListHeader() {
   const [{ userInfo }, dispatch] = useStateProvider();
   const [showTooltip, setShowTooltip] = useState(null);
+
+  const router = useRouter();
+
+  const [contextMenuCoords, setContextMenuCoords] = React.useState({
+      x: 0,
+      y: 0
+    });
+  
+    const [isContextMenuVisible, setIsContextMenuVisible] = React.useState(false);
+  
+    const showContextMenu = (e) => {
+      e.preventDefault()
+      setContextMenuCoords({
+        x: e.pageX,
+        y: e.pageY
+      })
+      setIsContextMenuVisible(true)
+    }
+  
+    const contextMenuOptions = [
+      {
+        name: "Logout",
+        callback: async () => {
+          setIsContextMenuVisible(false)
+          router.push("/logout");
+        }
+      }
+    ]
+
 
   const handleAllContacts = () => {
     dispatch({
@@ -32,8 +63,8 @@ function ChatListHeader() {
       <div className="flex gap-6">
         {[
           { Icon: BsFillChatLeftTextFill, title: "New Chat", onClick: handleAllContacts, color: "#00a884" },
-          { Icon: BsThreeDotsVertical, title: "More", color: "#00a884" }
-        ].map(({ Icon, title, onClick, color }) => (
+          { Icon: BsThreeDotsVertical, title: "More",onClick: (e)=>showContextMenu(e), id: "context-opener", color: "#00a884" }
+        ].map(({ Icon, title, onClick, id, color }) => (
           <div
             key={title}
             className="relative"
@@ -44,9 +75,11 @@ function ChatListHeader() {
               <Icon 
                 className="text-gray-300 hover:text-white cursor-pointer text-xl transition-colors"
                 style={{ color: showTooltip === title ? color : undefined }}
+                id={id}
                 onClick={onClick}
               />
             </div>
+            
             {showTooltip === title && (
               <div className="absolute top-[-30px] left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap z-50">
                 {title}
@@ -54,6 +87,16 @@ function ChatListHeader() {
             )}
           </div>
         ))}
+        {
+              isContextMenuVisible && (
+                <ContextMenu
+                  options={contextMenuOptions}
+                  coords={contextMenuCoords}
+                  contextMenu={isContextMenuVisible}
+                  setContextMenu={setIsContextMenuVisible}
+                />
+              )
+            }
       </div>
     </div>
   );

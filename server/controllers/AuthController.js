@@ -83,9 +83,9 @@ export const generateToken = (req, res, next) => {
         const effectiveTime = 3600;
         const payload = "";
 
-        if(appId && serverSecret){
+        if(appId && serverSecret && userId){
             const token = generateToken04(appId, userId, serverSecret, effectiveTime, payload);
-            res.status(200).json({token});
+            return res.status(200).json({token});
         }
         return res.status(400).send("Invalid appID or serverSecret");
     } catch(err){
